@@ -5,5 +5,5 @@ export interface TokenPayload{
 }
 
 export function createToken(payload:TokenPayload){
-    return jwt.sign(payload,env.jwtSecret,{expiresIn:"7d"})
+    return jwt.sign(payload,env.jwtSecret,{expiresIn:"7d"});
 }

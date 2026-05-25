@@ -4,7 +4,7 @@ import { safeParse } from "zod";
 import bcrypt from "bcryptjs"
 import { prisma } from "../db";
 import { createToken } from "../utils/auth";
-export async function authcontroller(req:Request,res:Response):Promise<void> {
+export async function signup(req:Request,res:Response):Promise<void> {
     //parse input using zod
     const parsedResponse =authschema.safeParse(req.body);
     if(!parsedResponse.success){
