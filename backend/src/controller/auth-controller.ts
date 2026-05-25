@@ -31,3 +31,45 @@ export async function authcontroller(req:Request,res:Response):Promise<void> {
     }
     
 }
+
+export async function signin(req:Request,res:Response):Promise<void>{
+
+    // parse the body
+    // vaildate token
+    // check username, password match
+    const parsedResponse =authschema.safeParse(req.body);
+    if(!parsedResponse.success){
+        res.status(400).json({"error":"bad input"})
+        return;
+    }
+    const username= req.body.username;
+    try {
+        const userdata= await prisma.user.findFirst({
+        where:{
+            username:username
+        }
+        
+    })
+        if(!userdata){
+            res.status(409).json({"error":"username does not exist"});
+            return;
+        }
+        const actualpassword= userdata?.password;
+        const reqpassword=req.body.password;
+        const hashpassword= await bcrypt.hash(reqpassword,10);
+        if(actualpassword!==hashpassword){
+            res.status(403).json({"error":"invalid signin"})
+            return;
+        }
+        res.status(201).json({
+            token:createToken({userid:userdata.id}),
+            userId:userdata.id,
+            username:userdata.username
+        })
+
+    } catch  {
+        res.status(404).json({"error":"username does not exist"})
+    }
+    
+    
+}
