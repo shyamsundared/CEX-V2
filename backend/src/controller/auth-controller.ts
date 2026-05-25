@@ -51,24 +51,22 @@ export async function signin(req:Request,res:Response):Promise<void>{
         
     })
         if(!userdata){
-            res.status(409).json({"error":"username does not exist"});
+            res.status(401).json({"error":"invalid credentials"});
             return;
         }
-        const actualpassword= userdata?.password;
+        const actualpassword= userdata.password;
         const reqpassword=req.body.password;
-        const hashpassword= await bcrypt.hash(reqpassword,10);
-        if(actualpassword!==hashpassword){
-            res.status(403).json({"error":"invalid signin"})
-            return;
-        }
-        res.status(201).json({
+        const ispasswordvalid =await bcrypt.compare(reqpassword,actualpassword);
+        if(!ispasswordvalid)
+        res.status(200).json({
             token:createToken({userid:userdata.id}),
             userId:userdata.id,
             username:userdata.username
         })
 
     } catch  {
-        res.status(404).json({"error":"username does not exist"})
+        res.status(404).json({"error":"invalid credentials"})
+        return;
     }
     
     
